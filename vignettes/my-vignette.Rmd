@@ -1,0 +1,302 @@
+---
+title: "Regression for Interval-valued Data"
+author: "Jungteak Jang"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = FALSE}
+library(truncnorm)
+```
+
+
+##1. Regression for Interval-valued data
+
+###1. 1. CRM
+
+Lima Neto et al.(2008) propose the Center and Range Method(CRM) that fits two separate linear regression models with the center points and the ranges of the intervals, respectively.  
+The basic idea is to estimate models independently for each of center points and range points of the interval variables. That is, they consider the ranges of the intervals in the estimation and prediction, as well as the centers.  
+The coefficients of the model are estimated by least square method. The CRM counts on the assumption of independence between center-points and ranges.
+
+###1. 2. CCRM
+
+Lima Neto et al.(2010) propose the Constrained Center and Range Model(CCRM) that fit a linear regression model based on the inequality constraints over the range variables.   
+The disadvantages of the CRM model is that the predicted valu of the range model may be negative.  
+Similar to Center and Range Method(CRM), but adds constraint condition that all estimative of the parameters of the range's model are positive.(based on inequality constraints) There is no constraints over the parameters estimates for the center point regression equation.
+
+###1. 3. SCM
+
+Xu(2010) proposes the Symbolic Covariance Method(SCM) that uses the symbolic covariance matrix proposed by Billard(2007, 2008).  
+This method considers the model with centered variables $Y- \bar{Y}=(X-\bar{X})\beta + \epsilon$. The regression coefficients are estimated by least square method, but it is used by symbolic covariance matrix. Because the process of calculating the symbolic sample covariance uses the lower and upper limits of each variable, the SCM reflects the variability of the interval.
+
+###1. 4. MCM-Uniform distribution
+
+Ahn et al.(2012) propose a regression approach for interval-valued data based on resampling. That is, in symbolic data, the observation of all variables is given as the interval. So this method is to resample by randomly selecting a single-valued point within each observed intervals. Then, fit a classical linear regression model on each single-valued points, and calculate the average of regression coefficients over the models.  
+The use of the resampling approach method, called Monte Carlo method (MCM), has the advantage of estimating on sample distribution approximately, and statistical inference is possible using this.  
+This method is used to fit a linear regression model based on the Monte Carlo Method using uniform distribution.  
+
+###1. 5. MCM-Truncated normal distribution
+
+Similar to MCM-Uniform distribution mentioned above, but this method is used to fit a linear regression model based on the Monte Carlo Method using truncated normal distribution.
+
+<br><br>
+
+##2. Assess the performance
+
+###2. 1. The root mean-square error(RMSE)
+
+The lower bound root mean-square error($RMSE_{L}$) and the upper bound root mean-square error($RMSE_{U}$) proposed by Lima Neto and de Carvalho(2008) measure the differences between the predicted values $[\hat{Y}_{L_{i}}, \hat{Y}_{U_{i}}]$ and the observed values $[Y_{L_{i}}, Y_{U_{i}}]$:  
+    
+$$RMSE_{L} = \sqrt{\frac{\sum^{n}_{i=1}(Y_{Li} - \hat{Y}_{Li})^2}{n}}$$
+          
+$$RMSE_{U} = \sqrt{\frac{\sum^{n}_{i=1}(Y_{Ui} - \hat{Y}_{Ui})^2}{n}}$$
+
+###2. 2. Symbolic correlation
+
+The symbolic sample covariance between interval-valued variables $X_{j}$ and $X_{k}$ is defined as follows (Billard, 2007, 2008):  
+  
+$$Cov(X_{j}, X_{k}) = \frac{1}{6n}\sum^{n}_{i=1} [2(X_{Lij}-\bar{X_{j}})(X_{Lik}-\bar{X_{k}}) + (X_{Lij}-\bar{X_{j}})(X_{Uik}-\bar{X_{k}}) + (X_{Uij}-\bar{X_{j}})(X_{Lik}-\bar{X_{k}}) + 2(X_{Uij}-\bar{X_{j}})(X_{Uik}-\bar{X_{k}})]$$
+where the symbolic sample mean of $X_{j}$ is defined as (Bertrand and Goupil, 2000):  
+    
+$$\bar{X_{j}} = \frac{1}{2n} \sum^{n}_{i=1}(X_{Lij} + X_{Uij})$$
+
+The symbolic correlation coefficient, $r$, proposed by Billard(2007, 2008) and applied to the regression problem by Xu(2010), measures the correlation between the predicted values $[\hat{Y}_{L_{i}}, \hat{Y}_{U_{i}}]$ and the observed values $[Y_{L_{i}}, Y_{U_{i}}]$:  
+  
+$$r(Y, \hat{Y})=\frac{Cov(Y, \hat{Y})}{S_{Y}S_{\hat{Y}}}$$
+
+where $S_{Y}$ and $S_{\hat{Y}}$ are the standard deviations of $Y_i$ and $\hat{Y}_{i}$ respectively, which can be computed as the following (Bertrand and Goupil, 2000):
+$$S^{2}_{Y} = \frac{1}{3n} \sum^{n}_{i=1}(a_{i}^2 + a_{i}b_{i}+b^{2}_{i}) - \frac{1}{4n^{2}}[\sum^{n}_{i=1}(a_i + b_i)]^{2}$$
+
+<br><br>
+
+##3. Essential notice
+
+In order to apply these functions, the `data.frame` should be composed as follows:  
+
+- In dataset, a pair of the interval variables should always be composed in order from lower to upper bound. For example,  
+
+| y_L      | y_U      | x1_L     | x1_U     | x2_L     | x2_U     | ...      |
+|----------|----------|----------|----------|----------|----------|----------|
+|$y_{L1}$  |$y_{U1}$  |$x_{L11}$ |$x_{U11}$ |$x_{L12}$ |$x_{U12}$ | ...      |
+|$y_{L2}$  |$y_{U2}$  |$x_{L21}$ |$x_{U21}$ |$x_{L22}$ |$x_{U22}$ | ...      |
+| ...      | ...      | ...      | ...      | ...      | ...      | ...      |
+|$y_{Li}$  |$y_{Ui}$  |$x_{Li1}$ |$x_{Ui1}$ |$x_{Li2}$ |$x_{Ui2}$ | ...      |
+| ...      | ...      | ...      | ...      | ...      | ...      | ...      |
+|$y_{Ln}$  |$y_{Un}$  |$x_{Ln1}$ |$x_{Un1}$ |$x_{Ln2}$ |$x_{Un2}$ | ...      |
+
+- The upper limit value of the variable sholud be unconditionally greater than the lower limit value. Otherwise, it will be output as Na or NaN and the value can not be generated.
+
+<br><br>
+
+##4. Application to simple simulation
+
+After fixing seed number `set.seed(2017)`, 30 random numbers were generated considering the lower and upper bounds.
+
+- `x1` : random numbers from normal distribution
+- `x2` : random numbers from uniform distribution
+- `y` : `x1+x2+noise`
+
+```{r}
+set.seed(2017)
+x1_L = rnorm(30, 3, 0.01) - rnorm(30, 0, 0.01)
+x1_U = rnorm(30, 3, 0.01) + rnorm(30, 3, 0.01)
+x2_L = runif(30, 1.5, 3) - runif(30, 0, 1)
+x2_U = runif(30, 1.5, 3) + runif(30, 1, 2)
+y_L = x1_L + x2_L + rnorm(30, 0, 0.03)
+y_U = x1_U + x2_U + rnorm(30, 0, 0.03)
+
+temp <- as.data.frame(cbind(y_L, y_U, x1_L, x1_U, x2_L, x2_U))
+```
+
+```{r, echo = FALSE, results == "asis"}
+knitr::kable(temp)
+```
+
+Applying function `imcmtn()`
+
+```{r, echo = FALSE}
+imcmtn <- function(formula = formula, data = data, b = 100) {
+
+  requireNamespace("truncnorm", quietly = TRUE)
+  #use_package("truncnorm")
+  #library(truncnorm)
+
+  n = nrow(data)
+
+  # input formula for regression
+  formula1 = as.formula(formula)
+  model_interval = model.frame(formula = formula1, data = data)
+
+  # response variable interval value
+  yinterval = model.response(model_interval)
+  y = as.matrix(yinterval)
+
+  # predictor variable interval matrix (each left: Lower, each right: Upper)
+  xinterval = model.matrix(attr(model_interval, "terms"), data = data)
+  x = as.matrix(xinterval)
+
+  p = ncol(x) - 1 # num. of predictor variable except intercept
+
+  ### Resampling STEP (by using truncated normal distribution) ###
+  # re-sampling response variable
+  re_y <- matrix(NA, n, b)
+
+  for (k in 1:b) {
+    for (i in 1:n) {
+      mean_y = ((y[i, 1] + y[i, 2]) / 2)
+      sigma = (y[i, 2] - y[i, 1])^{2} / 12
+      alpha = (y[i, 1] - mean_y) / sigma
+      beta = (y[i, 2] - mean_y) / sigma
+      re_y[i, k] = rtruncnorm(1, a = y[i, 1], b = y[i, 2],
+                              mean = mean_y,
+                              sd = sqrt(sigma^2 * (1 + (alpha*dnorm(alpha) - beta*dnorm(beta))/(pnorm(beta) - pnorm(alpha)) - ((dnorm(alpha) - dnorm(beta))/(pnorm(beta) - pnorm(alpha)))^{2})))
+    }
+  }
+
+  # re-sampling predictor variables
+  re_xx <- array(NA, c(n, {p/2}, b))
+  re_x <- array(NA, c(n, {p/2}+1, b)) # include intercept term
+
+  for (k in 1:b) {
+    for (j in 1:{p/2}) {
+      for (i in 1:n) {
+        mean_x = (x[i, {2*j}] + x[i, {2*j}+1]) / 2
+        sigma = (x[i, {2*j}+1] - x[i, {2*j}])^{2} / 12
+        alpha = (x[i, {2*j}] - mean_x) / sigma
+        beta = (x[i, {2*j}+1] - mean_x) / sigma
+        re_xx[i, j, k] = rtruncnorm(1, a = x[i, {2*j}], b = x[i, {2*j}+1],
+                                    mean = mean_x,
+                                    sd = sqrt(sigma^2 * (1 + (alpha*dnorm(alpha) - beta*dnorm(beta))/(pnorm(beta) - pnorm(alpha)) - ((dnorm(alpha)-dnorm(beta))/(pnorm(beta) - pnorm(alpha)))^{2})))
+      }
+    }
+    re_x[, , k] <- cbind(matrix(rep(1, n), ncol = 1), re_xx[, , k])
+  }
+
+
+  ### coefficient estimate STEP ###
+  # MCM beta matrix
+  re_coef <- matrix(NA, {p/2}+1, b)
+
+  for (k in 1:b) {
+    re_coef[, k] <- solve(t(re_x[, , k]) %*% re_x[, , k]) %*% t(re_x[, , k]) %*% re_y[, k]
+  }
+
+  estcoef <- apply(re_coef, 1, mean)
+
+  # coefficient standard error
+  coefse <- matrix(NA, nrow = {p/2}+1)
+
+  for (j in 1:{p/2}) {
+    for (k in 1:b) {
+      coefse[j+1, ] = sqrt(sum((re_coef[j+1, k] - estcoef[j+1])^{2}) / (b-1))
+    }
+  }
+
+  estcoef <- matrix(estcoef, ncol = 1)
+  coef <- cbind(estcoef, coefse)
+
+  var.names = colnames(x)[(1:{p/2})*2]
+  rownames(coef) <- c("intercept", var.names)
+
+  # p-value
+  p.value <- NULL
+  for (j in 1:{p/2}) {
+    z = coef[j+1, 1] / coef[j+1, 2]
+    p.value[j+1] =2 * (1 - pnorm(abs(z)))
+  }
+
+  coef <- cbind(coef, p.value)
+  colnames(coef) <- c("Coeff.", "S.E.", "p.value")
+  rownames(re_coef) <- c("intercept", var.names)
+
+  # fitted values (Lower & Upper)
+  fitted_L <- fitted_U <- NULL
+  for (i in 1:n) {
+    fitted_L[i] <- min(x[i, c(1, seq(2, p, by = 2))] %*% c(t(estcoef[, 1])), x[i, c(1, seq(3, p+1, by = 2))] %*% c(t(estcoef[, 1])))
+    fitted_U[i] <- max(x[i, c(1, seq(2, p, by = 2))] %*% c(t(estcoef[, 1])), x[i, c(1, seq(3, p+1, by = 2))] %*% c(t(estcoef[, 1])))
+  }
+  fitted_values <- cbind(fitted_L, fitted_U)
+  colnames(fitted_values) <- c("fitted.Lower", "fitted.Upper")
+
+
+  # residuals (Lower & Upper)
+  residual_L <- y[, 1] - fitted_L
+  residual_U <- y[, 2] - fitted_U
+  residuals <- cbind(residual_L, residual_U)
+  colnames(residuals) <- c("resid.Lower", "resid.Upper")
+
+
+  ### final output STEP ###
+  result <- list(call = match.call(),
+                 response = y,
+                 predictor = x,
+                 resampling.coefficients = re_coef,
+                 coefficients = coef,
+                 fitted.values = fitted_values,
+                 residuals = residuals)
+  return(result)
+}
+```
+
+```{r, echo = FALSE}
+RMSE <- function(model) {
+  y = model$response
+  yhat = model$fitted.values
+  n = nrow(y)
+
+  RMSE_L <- sqrt(sum((y[, 1]- yhat[, 1])^{2}) / n)
+  RMSE_U <- sqrt(sum((y[, 2]- yhat[, 2])^{2}) / n)
+
+  rmse <- cbind(RMSE_L, RMSE_U)
+  return(rmse)
+}
+```
+
+```{r, echo = FALSE}
+symbolic.r <- function(model) {
+  x = model$predictor
+  y = model$response
+  haty = model$fitted.values
+
+  # sample deviation
+  sample.dev <- function(lower, upper) {
+    n = length(lower)
+    s.cov = (sum(lower^2 + lower*upper + upper^2) / (3*n)) - (sum(lower + upper)^{2} / (4*n^{2}))
+
+    return(s.cov)
+  }
+
+  n = nrow(x)
+  meany = sum(y[, 1:2]) / (2*n)
+  meanhaty = sum(haty[, 1:2]) / (2*n)
+
+  # symbolic covariance
+  sym.c = ( sum(2*(y[, 1] - meany)*(haty[, 1] - meanhaty) +
+                  (y[, 1] - meany)*(haty[, 2] - meanhaty) +
+                  (y[, 2] - meany)*(haty[, 1] - meanhaty) +
+                  2*(y[, 2] - meany)*(haty[, 2] - meanhaty)) ) / ( 6*n )
+
+  sym.r = sym.c / (sqrt(sample.dev(y[, 1], y[, 2])) * sqrt(sample.dev(haty[, 1], haty[, 2])))
+
+  return(sym.r)
+}
+```
+
+
+```
+imcmtn(formula, data, b = 100)
+```
+
+```{r}
+m1 <- imcmtn(cbind(y_L, y_U) ~ x1_L + x1_U + x2_L + x2_U, data = temp, b = 100)
+m1
+RMSE(m1)
+symbolic.r(m1)
+```
+
