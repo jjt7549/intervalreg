@@ -40,6 +40,7 @@
 #' m1
 #' @seealso \code{\link{RMSE}} \code{\link{symbolic.r}}
 #' @import stats
+#' @export
 SCM <- function(formula = formula, data = data) {
 
   n = nrow(data)

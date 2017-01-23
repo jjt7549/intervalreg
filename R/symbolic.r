@@ -1,7 +1,7 @@
 #' The Symbolic Correlation
 #'
 #' The symbolic correlation coefficient, \eqn{r}, proposed by Billard(2007, 2008) and applied to the regression problem by Xu(2010), measures the correlation between the predicted values and the observed values.
-#' @param model \code{\link[imcm]{imcmuni}} or \code{\link[imcm]{imcmtn}} object, etc..
+#' @param model \code{\link{imcmuni}} or \code{\link{imcmtn}} object, etc..
 #'
 #' @references Billard(2007, 2008). Sample covariance functions for complex quantitative data
 #' @references Xu(2010), Symbolic Data Analysis: Interval-Valued Data Regression
@@ -17,6 +17,7 @@
 #' temp <- as.data.frame(cbind(y_L, y_U, x1_L, x1_U, x2_L, x2_U))
 #' m1 <- imcmtn(cbind(y_L, y_U) ~ x1_L + x1_U + x2_L + x2_U, data = temp, b = 100)
 #' symbolic.r(m1)
+#' @export
 symbolic.r <- function(model) {
   x = model$predictor
   y = model$response

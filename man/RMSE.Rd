@@ -7,7 +7,7 @@
 RMSE(model)
 }
 \arguments{
-\item{model}{\code{\link[imcm]{imcmuni}} or \code{\link[imcm]{imcmtn}} object, etc..}
+\item{model}{\code{\link{imcmuni}} or \code{\link{imcmtn}} object, etc..}
 }
 \description{
 The lower bound root mean-square error and the upper bound root mean-square error proposed by Lima Neto and de Carvalho(2008) measure the differences between the predicted values and the observed values.

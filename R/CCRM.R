@@ -40,6 +40,7 @@
 #' @seealso \code{\link{RMSE}} \code{\link{symbolic.r}}
 #' @import stats
 #' @importFrom mgcv pcls
+#' @export
 CCRM <- function(formula = formula, data = data) {
 
   # Non-negative Least Squares, Penalized Constrained Least Squares fitting
@@ -132,5 +133,7 @@ CCRM <- function(formula = formula, data = data) {
                  coefficeints.Range = coef.R,
                  fitted.values = fitted_values,
                  residuals = residuals)
+
   return(result)
+
 }

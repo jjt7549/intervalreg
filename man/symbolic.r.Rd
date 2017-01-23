@@ -7,7 +7,7 @@
 symbolic.r(model)
 }
 \arguments{
-\item{model}{\code{\link[imcm]{imcmuni}} or \code{\link[imcm]{imcmtn}} object, etc..}
+\item{model}{\code{\link{imcmuni}} or \code{\link{imcmtn}} object, etc..}
 }
 \description{
 The symbolic correlation coefficient, \eqn{r}, proposed by Billard(2007, 2008) and applied to the regression problem by Xu(2010), measures the correlation between the predicted values and the observed values.

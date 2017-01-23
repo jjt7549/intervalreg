@@ -1,47 +1,21 @@
-#' MCM for Interval-Valued Data Regression Using Truncated normal distribution
-#'
-#' \code{imcmtn()} is used to fit a linear regression model based on the Monte Carlo Method using truncated normal distribution.
-#' @param formula an object of class \code{\link[stats]{formula}}, a symbolic description of the model to be fitted.
-#' @param data an data frame containing the variables in the model.
-#' @param b number of resampling (default : 100)
-#'
-#' @details Similar to \code{imcmuni()}, but uses a truncated normal distribution rather than a uniform distribution.
-#'
-#' @note In dataset, a pair of the interval variables should always be composed in order from lower to upper bound. In order to apply this function, the data should be composed as follows:
-#' \tabular{cccccc}{
-#' \eqn{y_L}     \tab  \eqn{y_U}     \tab  \eqn{x1_L}    \tab  \eqn{x1_U}    \tab  \eqn{x2_L}    \tab  \eqn{x2_U}\cr
-#' \eqn{y_L1}  \tab  \eqn{y_U1}  \tab  \eqn{x_L11} \tab  \eqn{x_U11} \tab  \eqn{x_L12} \tab  \eqn{x_U12}\cr
-#' \eqn{y_L2}  \tab  \eqn{y_U2}  \tab  \eqn{x_L21} \tab  \eqn{x_U21} \tab  \eqn{x_L22} \tab  \eqn{x_U22}\cr
-#' \eqn{y_L3}  \tab  \eqn{y_U3}  \tab  \eqn{x_L31} \tab  \eqn{x_U31} \tab  \eqn{x_L32} \tab  \eqn{x_U32}\cr
-#' \eqn{y_L4}  \tab  \eqn{y_U4}  \tab  \eqn{x_L41} \tab  \eqn{x_U41} \tab  \eqn{x_L42} \tab  \eqn{x_U42}\cr
-#' \eqn{y_L5}  \tab  \eqn{y_U5}  \tab  \eqn{x_L51} \tab  \eqn{x_U51} \tab  \eqn{x_L52} \tab  \eqn{x_U52}\cr
-#' }
-#' @note The upper limit value of the variable should be unconditionally greater than the lower limit value. Otherwise, it will be output as \code{NA} or \code{NAN}, and the value can not be generated.
-#'
-#' @return \item{resampling.coefficients}{B coefficient vectors obtained by resampling.}
-#' @return \item{coefficients}{Average of B coefficients obtained by resampling, standard error and p-value.}
-#' @return \item{fitted.values}{The fitted values for the lower and upper interval bound.}
-#' @return \item{residuals}{The residuals for the lower and upper interval bound.}
-#'
-#' @references Ahn, J., Peng, M., Park, C., Jeon, Y.(2012), A Resampling Approach for Interval-Valued Data Regression. \emph{Statistical Analysis and Data Mining, 5, 336-348}
-#' @references Lim, S., Kang, K.(2016), On Statistical Analysis of Interval-Valued Data
-#'
-#' @examples
-#' set.seed(2017)
-#' x1_L = rnorm(30, 3, 0.01) - rnorm(30, 0, 0.01)
-#' x1_U = rnorm(30, 3, 0.01) + rnorm(30, 3, 0.01)
-#' x2_L = runif(30, 1.5, 3) - runif(30, 0, 1)
-#' x2_U = runif(30, 1.5, 3) + runif(30, 1, 2)
-#' y_L = x1_L + x2_L
-#' y_U = x1_U + x2_U
-#' temp <- as.data.frame(cbind(y_L, y_U, x1_L, x1_U, x2_L, x2_U))
-#' m1 <- imcmtn(cbind(y_L, y_U) ~ x1_L + x1_U + x2_L + x2_U, data = temp, b = 100)
-#' m1
-#'
-#' @seealso \code{\link[truncnorm]{rtruncnorm}} \code{\link{RMSE}} \code{\link{symbolic.r}}
-#' @import stats
-#' @importFrom truncnorm rtruncnorm
-#' @export
+## ---- echo = FALSE-------------------------------------------------------
+library(truncnorm)
+
+## ------------------------------------------------------------------------
+set.seed(2017)
+x1_L = rnorm(30, 3, 0.01) - rnorm(30, 0, 0.01)
+x1_U = rnorm(30, 3, 0.01) + rnorm(30, 3, 0.01)
+x2_L = runif(30, 1.5, 3) - runif(30, 0, 1)
+x2_U = runif(30, 1.5, 3) + runif(30, 1, 2)
+y_L = x1_L + x2_L + rnorm(30, 0, 0.03)
+y_U = x1_U + x2_U + rnorm(30, 0, 0.03)
+
+temp <- as.data.frame(cbind(y_L, y_U, x1_L, x1_U, x2_L, x2_U))
+
+## ---- echo = FALSE, results == "asis"------------------------------------
+knitr::kable(temp)
+
+## ---- echo = FALSE-------------------------------------------------------
 imcmtn <- function(formula = formula, data = data, b = 100) {
 
   requireNamespace("truncnorm", quietly = TRUE)
@@ -163,3 +137,52 @@ imcmtn <- function(formula = formula, data = data, b = 100) {
                  residuals = residuals)
   return(result)
 }
+
+## ---- echo = FALSE-------------------------------------------------------
+RMSE <- function(model) {
+  y = model$response
+  yhat = model$fitted.values
+  n = nrow(y)
+
+  RMSE_L <- sqrt(sum((y[, 1]- yhat[, 1])^{2}) / n)
+  RMSE_U <- sqrt(sum((y[, 2]- yhat[, 2])^{2}) / n)
+
+  rmse <- cbind(RMSE_L, RMSE_U)
+  return(rmse)
+}
+
+## ---- echo = FALSE-------------------------------------------------------
+symbolic.r <- function(model) {
+  x = model$predictor
+  y = model$response
+  haty = model$fitted.values
+
+  # sample deviation
+  sample.dev <- function(lower, upper) {
+    n = length(lower)
+    s.cov = (sum(lower^2 + lower*upper + upper^2) / (3*n)) - (sum(lower + upper)^{2} / (4*n^{2}))
+
+    return(s.cov)
+  }
+
+  n = nrow(x)
+  meany = sum(y[, 1:2]) / (2*n)
+  meanhaty = sum(haty[, 1:2]) / (2*n)
+
+  # symbolic covariance
+  sym.c = ( sum(2*(y[, 1] - meany)*(haty[, 1] - meanhaty) +
+                  (y[, 1] - meany)*(haty[, 2] - meanhaty) +
+                  (y[, 2] - meany)*(haty[, 1] - meanhaty) +
+                  2*(y[, 2] - meany)*(haty[, 2] - meanhaty)) ) / ( 6*n )
+
+  sym.r = sym.c / (sqrt(sample.dev(y[, 1], y[, 2])) * sqrt(sample.dev(haty[, 1], haty[, 2])))
+
+  return(sym.r)
+}
+
+## ------------------------------------------------------------------------
+m1 <- imcmtn(cbind(y_L, y_U) ~ x1_L + x1_U + x2_L + x2_U, data = temp, b = 100)
+m1
+RMSE(m1)
+symbolic.r(m1)
+

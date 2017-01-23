@@ -41,6 +41,7 @@
 #'
 #' @seealso \code{\link{RMSE}} \code{\link{symbolic.r}}
 #' @import stats
+#' @export
 imcmuni <- function(formula = formula, data = data, b = 100) {
 
   n = nrow(data)

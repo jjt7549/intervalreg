@@ -1,7 +1,7 @@
 #' The Root Mean-Square Error(RMSE)
 #'
 #' The lower bound root mean-square error and the upper bound root mean-square error proposed by Lima Neto and de Carvalho(2008) measure the differences between the predicted values and the observed values.
-#' @param model \code{\link[imcm]{imcmuni}} or \code{\link[imcm]{imcmtn}} object, etc..
+#' @param model \code{\link{imcmuni}} or \code{\link{imcmtn}} object, etc..
 #'
 #' @references Lima Neto, E.A. and De Carvalho, F.A.T(2010), Constrained linear regression models for symbolic interval-valued variables \emph{Computational Statistics and Data Analysis, 54}, 333-347
 #'
@@ -16,6 +16,7 @@
 #' temp <- as.data.frame(cbind(y_L, y_U, x1_L, x1_U, x2_L, x2_U))
 #' m1 <- imcmtn(cbind(y_L, y_U) ~ x1_L + x1_U + x2_L + x2_U, data = temp, b = 100)
 #' RMSE(m1)
+#' @export
 RMSE <- function(model) {
   y = model$response
   yhat = model$fitted.values
