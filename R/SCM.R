@@ -1,6 +1,6 @@
 #' Symbolic Covariance Method
 #'
-#' \code{CRM()} is used to fit a linear regression model based on symbolic covariance matrix(Xu, 2010).
+#' \code{SCM()} is used to fit a linear regression model based on symbolic covariance matrix(Xu, 2010).
 #' @param formula an object of class \code{\link[stats]{formula}}, a symbolic description of the model to be fitted.
 #' @param data an data frame containing the variables in the model.
 #'
@@ -28,16 +28,10 @@
 #' @references Xu, W.(2010), Symbolic Data Analysis: Interval-Valued Data Regression
 #'
 #' @examples
-#' set.seed(2017)
-#' x1_L = rnorm(30, 3, 0.01) - rnorm(30, 0, 0.01)
-#' x1_U = rnorm(30, 3, 0.01) + rnorm(30, 3, 0.01)
-#' x2_L = runif(30, 1.5, 3) - runif(30, 0, 1)
-#' x2_U = runif(30, 1.5, 3) + runif(30, 1, 2)
-#' y_L = x1_L + x2_L
-#' y_U = x1_U + x2_U
-#' temp <- as.data.frame(cbind(y_L, y_U, x1_L, x1_U, x2_L, x2_U))
-#' m1 <- SCM(cbind(y_L, y_U) ~ x1_L + x1_U + x2_L + x2_U, data = temp)
+#' data(example3)
+#' m1 <- SCM(cbind(Sepal.Length_L, Sepal.Length_U) ~ Sepal.Width_L + Sepal.Width_U + Petal.Length_L + Petal.Length_U + Petal.Length_L + Petal.Length_U, data = example3)
 #' m1
+#' m1$coefficients
 #' @seealso \code{\link{RMSE}} \code{\link{symbolic.r}}
 #' @import stats
 #' @export

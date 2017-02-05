@@ -28,16 +28,10 @@
 #' @references Ahn, J., Peng, M., Park, C., Jeon, Y.(2012), A Resampling Approach for Interval-Valued Data Regression. \emph{Statistical Analysis and Data Mining, 5}, 336-348
 #'
 #' @examples
-#' set.seed(2017)
-#' x1_L = rnorm(30, 3, 0.01) - rnorm(30, 0, 0.01)
-#' x1_U = rnorm(30, 3, 0.01) + rnorm(30, 3, 0.01)
-#' x2_L = runif(30, 1.5, 3) - runif(30, 0, 1)
-#' x2_U = runif(30, 1.5, 3) + runif(30, 1, 2)
-#' y_L = x1_L + x2_L
-#' y_U = x1_U + x2_U
-#' temp <- as.data.frame(cbind(y_L, y_U, x1_L, x1_U, x2_L, x2_U))
-#' m1 <- imcmuni(cbind(y_L, y_U) ~ x1_L + x1_U + x2_L + x2_U, data = temp, b = 100)
+#' data(example3)
+#' m1 <- imcmuni(cbind(Sepal.Length_L, Sepal.Length_U) ~ Sepal.Width_L + Sepal.Width_U + Petal.Length_L + Petal.Length_U + Petal.Length_L + Petal.Length_U, data = example3, b = 100)
 #' m1
+#' m1$coefficients
 #'
 #' @seealso \code{\link{RMSE}} \code{\link{symbolic.r}}
 #' @import stats

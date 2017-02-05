@@ -41,16 +41,10 @@ In dataset, a pair of the interval variables should always be composed in order 
 The upper limit value of the variable should be unconditionally greater than the lower limit value. Otherwise, it will be output as \code{NA} or \code{NAN}, and the value can not be generated.
 }
 \examples{
-set.seed(2017)
-x1_L = rnorm(30, 3, 0.01) - rnorm(30, 0, 0.01)
-x1_U = rnorm(30, 3, 0.01) + rnorm(30, 3, 0.01)
-x2_L = runif(30, 1.5, 3) - runif(30, 0, 1)
-x2_U = runif(30, 1.5, 3) + runif(30, 1, 2)
-y_L = x1_L + x2_L
-y_U = x1_U + x2_U
-temp <- as.data.frame(cbind(y_L, y_U, x1_L, x1_U, x2_L, x2_U))
-m1 <- CCRM(cbind(y_L, y_U) ~ x1_L + x1_U + x2_L + x2_U, data = temp)
+data(example3)
+m1 <- CCRM(cbind(Sepal.Length_L, Sepal.Length_U) ~ Sepal.Width_L + Sepal.Width_U + Petal.Length_L + Petal.Length_U + Petal.Length_L + Petal.Length_U, data = example3)
 m1
+m1$coefficients
 }
 \references{
 Lima Neto, E.A. and De Carvalho, F.A.T(2010), Constrained linear regression models for symbolic interval-valued variables \emph{Computational Statistics and Data Analysis, 54}, 333-347
